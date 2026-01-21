@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Aplikasi Simulasi Estimasi Angka Kredit untuk Alih Kategori JF Keterampilan ke JF Keahlian.">
+    <title>Simulasi Estimasi AK Alih Kategori</title>
+    
+    <!-- Favicon (Ikon Tab) -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📊</text></svg>">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-slate-50 min-h-screen p-4 md:p-8 relative">
+    
+    <div class="max-w-4xl mx-auto bg-white rounded-xl shadow-xl overflow-hidden border border-slate-200">
+        <!-- Header -->
+        <div class="bg-emerald-700 p-6 text-white">
+            <h1 class="text-xl md:text-2xl font-bold flex items-center gap-3">
+                <i class="fa-solid fa-file-invoice-dollar"></i>
+                Simulasi Estimasi Angka Kredit
+            </h1>
+            <p class="text-emerald-100 text-sm mt-1 ml-9">Alih Kategori JF Keterampilan ke JF Keahlian</p>
+        </div>
+
+        <!-- Form Input Data -->
+        <div class="p-6 bg-slate-50 border-b border-slate-200">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
+                <!-- Nama -->
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Nama Pegawai</label>
+                    <input type="text" id="nama" class="w-full p-2.5 border border-gray-300 rounded focus:ring-2 focus:ring-emerald-500 outline-none" placeholder="Masukkan nama lengkap">
+                </div>
+
+                <!-- NIP -->
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">NIP</label>
+                    <input type="text" id="nip" maxlength="18"
+                           oninput="this.value = this.value.replace(/[^0-9]/g, '')"
+                           class="w-full p-2.5 border border-gray-300 rounded focus:ring-2 focus:ring-emerald-500 outline-none" 
+                           placeholder="Masukkan NIP (Angka saja, tanpa spasi)">
+                </div>
+
+                <!-- Golongan -->
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Golongan Ruang</label>
+                    <select id="golongan" onchange="updateAttributes()" class="w-full p-2.5 border border-gray-300 rounded focus:ring-2 focus:ring-emerald-500 outline-none bg-white">
+                        <option value="">-- Pilih Golongan --</option>
+                        <option value="III/a">III/a</option>
+                        <option value="III/b">III/b</option>
+                        <option value="III/c">III/c</option>
+                        <option value="III/d">III/d</option>
+                    </select>
+                </div>
+
+                <!-- TMT Golongan -->
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">TMT Golongan</label>
+                    <input type="date" id="tmtGolongan" class="w-full p-2.5 border border-gray-300 rounded focus:ring-2 focus:ring-emerald-500 outline-none">
+                </div>
+
+                <!-- Jabatan -->
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Jabatan Saat Ini</label>
+                    <select id="jabatan" onchange="updateTargetJabatan()" class="w-full p-2.5 border border-gray-300 rounded focus:ring-2 focus:ring-emerald-500 outline-none bg-white">
+                        <option value="">-- Pilih Jabatan --</option>
+                        <option value="Terampil">Terampil</option>
+                        <option value="Mahir">Mahir</option>
+                        <option value="Penyelia">Penyelia</option>
+                    </select>
+                </div>
+
+                <!-- Jabatan Diusulkan -->
+                <div>
+                    <label class="block text-sm font-semibold text-gray-500 mb-1">Jabatan yang Diusulkan</label>
+                    <input type="text" id="jabatanBaru" class="w-full p-2.5 border border-gray-200 bg-gray-100 text-gray-600 rounded cursor-not-allowed font-medium" readonly placeholder="Otomatis terisi">
+                </div>
+
+                 <!-- Perkiraan TMT Baru -->
+                 <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Perkiraan TMT Jabatan Baru</label>
+                    <input type="date" id="tmtBaru" class="w-full p-2.5 border border-gray-300 rounded focus:ring-2 focus:ring-emerald-500 outline-none">
+                </div>
+
+                <!-- Spacer -->
+                <div class="hidden md:block"></div>
+
+                <!-- AK Dasar & Koefisien -->
+                <div>
+                    <label class="block text-sm font-semibold text-gray-500 mb-1">Angka Kredit Dasar</label>
+                    <input type="number" id="akDasar" class="w-full p-2.5 border border-gray-200 bg-gray-100 text-gray-800 rounded cursor-not-allowed font-bold" readonly value="0">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-semibold text-gray-500 mb-1">Koefisien per Tahun</label>
+                    <input type="number" id="koefisien" class="w-full p-2.5 border border-gray-200 bg-gray-100 text-gray-800 rounded cursor-not-allowed font-bold" readonly value="0">
+                </div>
+            </div>
+
+             <!-- Action Button -->
+            <div class="mt-6 flex justify-end gap-3">
+                <button onclick="resetForm()" class="bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold py-2.5 px-6 rounded shadow transition duration-200 flex items-center gap-2">
+                    <i class="fa-solid fa-rotate-left"></i> Reset
+                </button>
+                <button onclick="calculate()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 px-8 rounded shadow-lg transition duration-200 flex items-center gap-2">
+                    <i class="fa-solid fa-calculator"></i> Hitung
+                </button>
+            </div>
+        </div>
+
+        <!-- Result Area -->
+        <div id="resultArea" class="hidden">
+            <div class="p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-lg font-bold text-gray-800">Rincian Perhitungan Angka Kredit</h3>
+                </div>
+
+                <!-- Detailed Table Container -->
+                <div id="tableContainer" class="overflow-x-auto border border-gray-200 rounded-lg">
+                    <table class="w-full text-sm text-left result-table">
+                        <thead class="bg-gray-100 text-gray-700 uppercase text-xs font-bold border-b border-gray-200">
+                            <tr>
+                                <th class="px-4 py-3 w-20">Tahun</th>
+                                <th class="px-4 py-3">Periode</th>
+                                <th class="px-4 py-3">Durasi</th>
+                                <th class="px-4 py-3 text-right">Angka Kredit (AK)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="breakdownTable" class="divide-y divide-gray-100 bg-white">
+                            <!-- Rows generated by JS -->
+                        </tbody>
+                        <tfoot class="bg-slate-50 text-slate-800">
+                            <tr class="font-semibold border-t-2 border-slate-200">
+                                <td colspan="3" class="px-4 py-3 text-right uppercase text-xs tracking-wider">Total AK Pengalaman</td>
+                                <td class="px-4 py-3 text-right text-blue-700" id="totalAKPengalaman">0.000</td>
+                            </tr>
+                            <tr class="font-semibold border-t border-slate-200 text-gray-600 bg-gray-50/50">
+                                <td colspan="3" class="px-4 py-3 text-right uppercase text-xs tracking-wider">Angka Kredit Dasar</td>
+                                <td class="px-4 py-3 text-right" id="displayAKDasar">0.000</td>
+                            </tr>
+                             <tr class="bg-emerald-50 font-bold text-emerald-900 border-t border-emerald-100 text-base">
+                                <td colspan="3" class="px-4 py-4 text-right">TOTAL AK (Dasar + Pengalaman)</td>
+                                <td class="px-4 py-4 text-right" id="grandTotalAK">0.000</td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+                
+                <p class="text-xs text-gray-400 mt-2 mb-6 italic">* Masa penilaian berakhir pada akhir bulan sebelum TMT Jabatan Baru.</p>
+
+                <!-- KOTAK REKOMENDASI BARU -->
+                <div class="bg-blue-50 border-l-4 border-blue-600 p-4 rounded shadow-sm flex items-start gap-4">
+                    <div class="flex-shrink-0 mt-1">
+                        <i class="fa-solid fa-circle-info text-blue-600 text-xl"></i>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-blue-800 text-sm uppercase mb-1">Rekomendasi</h4>
+                        <p class="text-blue-900 font-medium">
+                            Silakan membuat PAK Khusus Alih Kategori mengacu pada perhitungan ini.
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const monthNames = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+        
+        // --- UI Logic ---
+        function updateAttributes() {
+            const gol = document.getElementById('golongan').value;
+            const akDasarEl = document.getElementById('akDasar');
+            const coefEl = document.getElementById('koefisien');
+            
+            let akDasar = 0; let coef = 0;
+            if (gol === 'III/a') akDasar = 0;
+            else if (gol === 'III/b') akDasar = 50;
+            else if (gol === 'III/c') akDasar = 0;
+            else if (gol === 'III/d') akDasar = 100;
+
+            if (gol === 'III/a' || gol === 'III/b') coef = 12.5;
+            else if (gol === 'III/c' || gol === 'III/d') coef = 25;
+
+            akDasarEl.value = akDasar;
+            coefEl.value = coef;
+        }
+
+        function updateTargetJabatan() {
+            const current = document.getElementById('jabatan').value;
+            const targetEl = document.getElementById('jabatanBaru');
+            
+            if (current === 'Terampil' || current === 'Mahir') targetEl.value = 'Ahli Pertama';
+            else if (current === 'Penyelia') targetEl.value = 'Ahli Muda';
+            else targetEl.value = '';
+        }
+
+        function resetForm() {
+            document.getElementById('nama').value = '';
+            document.getElementById('nip').value = '';
+            document.getElementById('golongan').value = '';
+            document.getElementById('jabatan').value = '';
+            document.getElementById('tmtGolongan').value = ''; 
+            document.getElementById('tmtBaru').value = '';
+            
+            updateAttributes();
+            updateTargetJabatan();
+            document.getElementById('resultArea').classList.add('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // --- Calculate Logic ---
+        function calculate() {
+            const startInput = document.getElementById('tmtGolongan').value;
+            const targetInputRaw = document.getElementById('tmtBaru').value;
+            const coef = parseFloat(document.getElementById('koefisien').value);
+            const baseAK = parseFloat(document.getElementById('akDasar').value);
+            const nama = document.getElementById('nama').value;
+            const nip = document.getElementById('nip').value;
+            const gol = document.getElementById('golongan').value;
+
+            // Validasi Input
+            if (!nama || !nip || !gol || !startInput || !targetInputRaw || coef === 0) {
+                Swal.fire('Data Tidak Lengkap', 'Mohon lengkapi Nama, NIP, Golongan dan Tanggal.', 'warning');
+                return;
+            }
+
+            // Validasi Tanggal
+            const startDate = new Date(startInput);
+            const rawTargetDate = new Date(targetInputRaw);
+            // TMT Baru dihitung start masa penilainnya sampai akhir bulan sebelumnya
+            const targetDate = new Date(rawTargetDate.getFullYear(), rawTargetDate.getMonth(), 1);
+
+            if (startDate >= targetDate) {
+                Swal.fire('Tanggal Invalid', 'Tanggal TMT Jabatan Baru harus minimal satu bulan setelah TMT Golongan.', 'error');
+                return;
+            }
+
+            let currentCursor = new Date(startDate);
+            let breakdown = [];
+            let totalAKPengalaman = 0;
+
+            // Loop Kalkulasi
+            while (currentCursor < targetDate) {
+                const currentYear = currentCursor.getFullYear();
+                let periodEnd = new Date(currentYear, 11, 31);
+                
+                // Jika akhir tahun melebihi target, potong di target
+                if (periodEnd >= targetDate) {
+                    periodEnd = new Date(targetDate);
+                    periodEnd.setDate(periodEnd.getDate() - 1);
+                }
+                
+                let diff = calculateDuration(currentCursor, periodEnd);
+                
+                // Hitung Proporsional
+                let totalMonthsInRow = (diff.years * 12) + diff.months;
+                let monthFraction = diff.days / 30; 
+                let effectiveMonths = totalMonthsInRow + monthFraction;
+                let rowAK = (effectiveMonths * coef) / 12;
+
+                let durText = "";
+                if (diff.years > 0) durText += `${diff.years} tahun `;
+                if (diff.months > 0) durText += `${diff.months} bulan `;
+                if (diff.days > 0) durText += `${diff.days} hari`; 
+
+                let startStr = `${currentCursor.getDate()} ${monthNames[currentCursor.getMonth()]}`;
+                let endStr = `${periodEnd.getDate()} ${monthNames[periodEnd.getMonth()]}`;
+
+                breakdown.push({
+                    year: currentYear,
+                    period: `${startStr} - ${endStr}`,
+                    duration: durText.trim(),
+                    ak: rowAK
+                });
+
+                totalAKPengalaman += rowAK;
+                
+                // Maju ke 1 Jan tahun berikutnya
+                currentCursor = new Date(currentYear + 1, 0, 1);
+            }
+
+            renderResult(breakdown, totalAKPengalaman, baseAK);
+        }
+
+        function calculateDuration(start, end) {
+            let d1 = new Date(start);
+            let d2 = new Date(end);
+            d2.setDate(d2.getDate() + 1); // Tambah 1 hari agar inklusif
+
+            let years = d2.getFullYear() - d1.getFullYear();
+            let months = d2.getMonth() - d1.getMonth();
+            let days = d2.getDate() - d1.getDate();
+
+            if (days < 0) {
+                months--;
+                let prevMonthDate = new Date(d2.getFullYear(), d2.getMonth(), 0);
+                days += prevMonthDate.getDate();
+            }
+            if (months < 0) {
+                years--;
+                months += 12;
+            }
+            return { years, months, days };
+        }
+
+        function renderResult(rows, totalExp, base) {
+            const tbody = document.getElementById('breakdownTable');
+            tbody.innerHTML = '';
+
+            rows.forEach(row => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="px-4 py-3 font-medium text-gray-900 border-b border-gray-100">${row.year}</td>
+                    <td class="px-4 py-3 text-gray-600 border-b border-gray-100">${row.period}</td>
+                    <td class="px-4 py-3 text-gray-600 border-b border-gray-100">${row.duration}</td>
+                    <td class="px-4 py-3 text-right font-mono font-medium text-emerald-700 border-b border-gray-100">${row.ak.toFixed(3)}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            document.getElementById('totalAKPengalaman').textContent = totalExp.toFixed(3);
+            document.getElementById('displayAKDasar').textContent = base.toFixed(3);
+            document.getElementById('grandTotalAK').textContent = (base + totalExp).toFixed(3);
+
+            const resultArea = document.getElementById('resultArea');
+            resultArea.classList.remove('hidden');
+            resultArea.scrollIntoView({ behavior: 'smooth' });
+        }
+    </script>
+</body>
+</html>
