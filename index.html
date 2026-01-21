@@ -48,9 +48,9 @@
         }
     </style>
 </head>
-<body class="bg-slate-50 min-h-screen p-4 md:p-8 relative">
+<body class="bg-slate-50 min-h-screen p-4 md:p-8 relative flex flex-col items-center">
     
-    <div class="max-w-4xl mx-auto bg-white rounded-xl shadow-xl overflow-hidden border border-slate-200 print:shadow-none print:border-none">
+    <div class="w-full max-w-4xl bg-white rounded-xl shadow-xl overflow-hidden border border-slate-200 print:shadow-none print:border-none mb-6">
         <!-- Header -->
         <div class="bg-emerald-700 p-6 text-white print:bg-white print:text-black print:p-0 print:border-b-2 print:border-emerald-700 print:mb-6">
             <h1 class="text-xl md:text-2xl font-bold flex items-center gap-3">
@@ -181,7 +181,7 @@
                         </tbody>
                         <tfoot class="bg-slate-50 text-slate-800 print:bg-gray-50">
                             <tr class="font-semibold border-t-2 border-slate-200 print:border-gray-400">
-                                <td colspan="3" class="px-4 py-3 text-right uppercase text-xs tracking-wider">Total AK Pengalaman</td>
+                                <td colspan="3" class="px-4 py-3 text-right uppercase text-xs tracking-wider">Total AK Kinerja</td>
                                 <td class="px-4 py-3 text-right text-blue-700 print:text-black" id="totalAKPengalaman">0.000</td>
                             </tr>
                             <tr class="font-semibold border-t border-slate-200 text-gray-600 bg-gray-50/50">
@@ -189,14 +189,14 @@
                                 <td class="px-4 py-3 text-right" id="displayAKDasar">0.000</td>
                             </tr>
                              <tr class="bg-emerald-50 font-bold text-emerald-900 border-t border-emerald-100 text-base print:bg-gray-100 print:text-black print:border-gray-400">
-                                <td colspan="3" class="px-4 py-4 text-right">TOTAL AK (Dasar + Pengalaman)</td>
+                                <td colspan="3" class="px-4 py-4 text-right">TOTAL AK (Dasar + Kinerja)</td>
                                 <td class="px-4 py-4 text-right" id="grandTotalAK">0.000</td>
                             </tr>
                         </tfoot>
                     </table>
                 </div>
                 
-                <p class="text-xs text-gray-400 mt-2 mb-6 italic print:text-gray-600">* Masa penilaian berakhir pada akhir bulan sebelum TMT Jabatan Baru.</p>
+                <p class="text-xs text-gray-400 mt-2 mb-6 italic print:text-gray-600">* Masa penilaian berakhir pada akhir bulan sebelum TMT Jenjang Baru.</p>
 
                 <!-- KOTAK REKOMENDASI -->
                 <div class="bg-blue-50 border-l-4 border-blue-600 p-4 rounded shadow-sm flex items-start gap-4 print:border-gray-500 print:bg-white print:border">
@@ -219,6 +219,11 @@
             </div>
         </div>
     </div>
+
+    <!-- Footer Halaman Web (Tidak ikut dicetak) -->
+    <footer class="text-center text-xs text-slate-400 no-print pb-4">
+        By: reza_asnbalanganbelajar
+    </footer>
 
     <script>
         const monthNames = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
